@@ -1,0 +1,44 @@
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+
+import { applyMiddleware, createStore, StoreEnhancer } from 'redux'; // StoreEnhancer import 추가 ... 해야지만 createStore 에서 미들웨어가 전달이 되네
+
+import rootReducer from './reducers';
+import { Provider } from 'react-redux';
+
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
+
+// 미들웨어 함수 생성
+const loggerMiddleware = (store:any)=>(next:any)=>(action: any)=>{    
+  console.log("store", store); // 현재 상태를 로그에 출력
+  console.log("action", action); // 발생한 액션을 로그에 출력
+  next(action); // 다음 미들웨어 또는 리듀서에 액션 전달
+}
+
+const middleware = applyMiddleware(loggerMiddleware);
+
+// createStore 함수의 세 번째 매개변수로 enhancer를 전달하여 미들웨어를 추가
+const store = createStore(rootReducer, undefined, middleware as StoreEnhancer);
+
+const render = () =>root.render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <App 
+        value={store.getState()} 
+        onIncrement={() => store.dispatch({ type: "INCREMENT" })} 
+        onDecrement={() => store.dispatch({ type: "DECREMENT" })} 
+      />
+    </Provider>
+  </React.StrictMode>
+);
+
+render(); 
+
+store.subscribe(render); 
+
+reportWebVitals(); 
