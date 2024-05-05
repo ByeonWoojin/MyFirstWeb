@@ -1,0 +1,48 @@
+import React, { useState } from 'react';
+import logo from './logo.svg';
+import './App.css';
+import { useDispatch, useSelector } from 'react-redux'; // react-redux에서 useDispatch와 useSelector 가져오기
+import { RootState } from './reducers'; // RootState 가져오기
+
+type Props = {
+  value: { counter: number }; // value 프롭을 객체 타입으로 변경하고, counter 속성만 사용
+  onIncrement: () => void;
+  onDecrement: () => void;
+}
+
+function App({ value, onIncrement, onDecrement }: Props) {
+  const dispatch = useDispatch(); // useDispatch hook을 사용하여 dispatch 함수 가져오기
+  const counter = useSelector((state: RootState) => state.counter); // useSelector hook을 사용하여 Redux 상태에서 counter 가져오기
+  const todos: string[] = useSelector((state: RootState) => state.todos); // useSelector hook을 사용하여 Redux 상태에서 todos 가져오기
+
+  const [todoValue, setTodoValue] = useState(""); // useState hook을 사용하여 todoValue와 setTodoValue 생성
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTodoValue(e.target.value);
+  }
+  const addTodo = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    dispatch({ type: "ADD_TODO", text: todoValue }) // Redux store에 새로운 todo 추가를 위해 dispatch 함수 사용
+    setTodoValue("")
+  }
+  return (
+    <div className="App">
+      Clicked: {value.counter} times {/* counter 속성을 렌더링 */}
+      <button onClick={onIncrement}>
+        +
+      </button>
+      <button onClick={onDecrement}>
+        -
+      </button>
+
+      <ul>
+        {todos.map((todo, index) => <li key={index}>{todo}</li>)} {/* todos 배열을 매핑하여 각 todo를 리스트 아이템으로 렌더링 */}
+      </ul>
+      <form onSubmit={addTodo}>
+        <input type='text' value={todoValue} onChange={handleChange} />
+        <input type='submit' />
+      </form>
+    </div>
+  );
+}
+
+export default App;
